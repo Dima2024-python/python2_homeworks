@@ -1,7 +1,6 @@
 import sqlite3
-from pprint import pprint
 
-with sqlite3.connect('new_db.sqlite3') as connection:
+with sqlite3.connect("new_db.sqlite3") as connection:
     cursor = connection.cursor()
 
     query = """
@@ -18,10 +17,9 @@ with sqlite3.connect('new_db.sqlite3') as connection:
             id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
             name TEXT NOT NULL
         )
-        
     """
 
-#    cursor.execute(query)
+    #    cursor.execute(query)
 
     query = """
             CREATE TABLE IF NOT EXISTS device(
@@ -34,7 +32,7 @@ with sqlite3.connect('new_db.sqlite3') as connection:
             )
     """
 
-    #cursor.execute(query)
+    # cursor.execute(query)
 
     # insert_query = """
     #     INSERT INTO category (name)
@@ -48,11 +46,10 @@ with sqlite3.connect('new_db.sqlite3') as connection:
             VALUES (?, ?, ?, ?)
         """
     devices = [
-        ('Samsung S23', 45000, 50000, 1),
-        ('Serfing', 3000, 4000, 5),
+        ("Samsung S23", 45000, 50000, 1),
+        ("Serfing", 3000, 4000, 5),
     ]
     cursor.executemany(insert_query_device, devices)
-
 
     # query = """
     #     SELECT title, price, whole_price
@@ -70,5 +67,3 @@ with sqlite3.connect('new_db.sqlite3') as connection:
     # result = cursor.execute(query)
     # # pprint(result.fetchall(), indent=4)
     # pprint(result.fetchmany(size=200), indent=4)
-
-

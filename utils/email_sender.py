@@ -1,10 +1,11 @@
 import os.path
-import config
+import smtplib
+from email import encoders
+from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from email.mime.base import MIMEBase
-from email import encoders
-import smtplib
+
+import config
 
 
 def send_email(recipients: list[str], mail_subject: str, mail_body: str, attachment: str = None) -> None:

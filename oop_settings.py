@@ -8,5 +8,5 @@ class LibraryItem:
         return f"Title: {self.title}, Author/Director: {self.author_or_director}, Year: {self.year}"
 
 
-library = LibraryItem('iii', 'kkk', 90)
+library = LibraryItem("iii", "kkk", 90)
 print(library)
