@@ -1,7 +1,7 @@
 import sqlite3
 from pprint import pprint
 
-with sqlite3.connect('book_store.sqlite3') as connection:
+with sqlite3.connect("book_store.sqlite3") as connection:
     cursor = connection.cursor()
 
     query = """
@@ -19,15 +19,16 @@ with sqlite3.connect('book_store.sqlite3') as connection:
         VALUES (?, ?)
     """
 
-    new_authors = [('Еріх Марія Ремарк', 1898),
-                    ('Фредерік Бегбеде', 1965),
-                    ('Чарльз Діккенс', 1812),
-                    ('Француаза Саган', 1935)
-                   ]
+    new_authors = [
+        ("Еріх Марія Ремарк", 1898),
+        ("Фредерік Бегбеде", 1965),
+        ("Чарльз Діккенс", 1812),
+        ("Француаза Саган", 1935),
+    ]
 
     cursor.executemany(insert_query, new_authors)
 
-    cursor.execute(insert_query, ['Шарлотта Бронте', 1816])
+    cursor.execute(insert_query, ["Шарлотта Бронте", 1816])
 
     query_where = """
          SELECT title
@@ -43,9 +44,9 @@ with sqlite3.connect('book_store.sqlite3') as connection:
     """
 
     result2 = cursor.execute(query_where)
-    print('#6 \n')
+    print("#6 \n")
     pprint(result2.fetchall())
-    print('\n#9\n')
+    print("\n#9\n")
 
     result = cursor.execute(query_where2)
     pprint(result.fetchall(), indent=1)
