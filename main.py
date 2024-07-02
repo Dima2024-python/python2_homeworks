@@ -1,60 +1,78 @@
-from fastapi import FastAPI, Request
+from contextlib import contextmanager
+
+from fastapi import FastAPI, Request, Query, HTTPException
+from fastapi.params import Path
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
+from starlette import status
 
-app = FastAPI()
+import config
+import dao
+from database import create_tables
+from schemas import NewProduct, CreatedProduct, DeletedProduct
 
 templates = Jinja2Templates(directory='templates')
 
-books = [
-    {
-        'title': "1984",
-        "author": "George Orwell",
-        "year": 1949,
-        "genre": "Dystopian, Political Fiction",
-        'info': 'https://uk.wikipedia.org/wiki/1984_(%D1%80%D0%BE%D0%BC%D0%B0%D0%BD)'
 
-    },
-    {
-        'title': "To Kill a Mockingbird",
-        "author": "Harper Lee",
-        "year": 1960,
-        "genre": "Southern Gothic, Bildungsroman",
-        'info': 'https://uk.wikipedia.org/wiki/1984_(%D1%80%D0%BE%D0%BC%D0%B0%D0%BD)'
-    },
-    {
-        'title': "The Great Gatsby",
-        "author": 'F. Scott Fitzgerald',
-        "year": 1925,
-        "genre": "Tragedy",
-        'info': 'https://uk.wikipedia.org/wiki/%D0%92%D0%B5%D0%BB%D0%B8%D0%BA%D0%B8%D0%B9_%D0%93%D0%B5%D1%82%D1%81%D0%B1%D1%96'
-    },
-    {
-        'title': "Moby-Dick",
-        "author": "Herman Melville",
-        "year": 1851,
-        "genre": "Adventure, Epic",
-        'info': 'https://ru.wikipedia.org/wiki/%D0%9C%D0%BE%D0%B1%D0%B8_%D0%94%D0%B8%D0%BA'
-    },
-    {
-        'title': "Pride and Prejudice",
-        "author": "Jane Austen",
-        "year": 1813,
-        "genre": "Romantic Fiction",
-        'info': 'https://uk.wikipedia.org/wiki/%D0%93%D0%BE%D1%80%D0%B4%D1%96%D1%81%D1%82%D1%8C_%D1%96_%D1%83%D0%BF%D0%B5%D1%80%D0%B5%D0%B4%D0%B6%D0%B5%D0%BD%D0%BD%D1%8F_(%D1%84%D1%96%D0%BB%D1%8C%D0%BC,_2005)'
-    }
-]
+# @contextmanager
+def lifespan(app: FastAPI):
+    create_tables()
+    yield
 
 
-@app.get('/api/')
-def index() -> dict:
-    return {'status': 'OK'}
+app = FastAPI(
+    debug=config.DEBUG,
+    lifespan=lifespan)
 
 
-@app.get('/')
-def index_(request: Request):
-    return templates.TemplateResponse('index.html', {'request': request, 'data': books, 'title': 'Main page'})
+@app.post('/api/products/create/', status_code=status.HTTP_201_CREATED, tags=['API', 'Products'])
+def crete_product(new_product: NewProduct) -> CreatedProduct:
+    print(new_product.dict())
+    created_product = dao.create_product(**new_product.dict())
+    return created_product
 
+
+@app.get('/api/products/', tags=['API', 'Products'])
+def get_products(limit: int = Query(default=5, gt=0, le=50, description='Number of products'),
+                 skip: int = Query(default=5, ge=0, description='How many to skip'),
+                 name: str = Query(default='', description='Part of the product name')
+                 ) -> list[CreatedProduct]:
+    products = dao.get_all_products(limit=limit, skip=skip, name=name)
+    return products
+
+
+@app.get('/api/products/{product_id}', tags=['API', 'Products'])
+def get_product(product_id: int = Path(gt=0, description='Number of product')) -> CreatedProduct:
+    products = dao.get_all_product_by_id(product_id=product_id)
+    if products:
+        return products
+    raise HTTPException(status_code=404, detail='Not found')
+
+
+@app.put('/api/products/{product_id}', tags=['API', 'Products'])
+def update_product(updated_product: NewProduct,
+                   product_id: int = Path(gt=0, description='Number of product')) -> CreatedProduct:
+    products = dao.get_all_product_by_id(product_id=product_id)
+    if not products:
+        raise HTTPException(status_code=404, detail='Not found')
+
+    products = dao.update_product(product_id, **updated_product.dict())
+    return products
+
+
+@app.delete('/api/products/{product_id}', tags=['API', 'Products'])
+def delete_product(product_id: int = Path(gt=0, description='Number of product')) -> DeletedProduct:
+    products = dao.get_all_product_by_id(product_id=product_id)
+    if not products:
+        raise HTTPException(status_code=404, detail='Not found')
+    dao.delete_product(product_id=product_id)
+    return DeletedProduct(id=product_id)
+
+
+@app.get('/', include_in_schema=False)
+def index_web(request: Request):
+
+    return templates.TemplateResponse('index.html', {'request': request, 'books': {}, 'title': 'Main page'})
 
 
 
