@@ -2,12 +2,12 @@ from fastapi import Query, Path, HTTPException, APIRouter
 from starlette import status
 
 import dao_travel_agency
-from api_router.schemas_travel_agency import NewTravel, TravelId
+from schemas_travel_agency_travels import NewTravel, TravelId
 
 
 api_router_travel_agency = APIRouter(
     prefix='/api/travels',
-    tags=["API", "Travels"]
+    tags=["API Travels"]
 )
 
 
@@ -18,23 +18,27 @@ def create_travel(new_travel: NewTravel) -> NewTravel:
 
 
 @api_router_travel_agency.get("/")
-def get_travels(
-    limit: int = Query(default=5, gt=0, le=50, description="Number of travel"),
-    skip: int = Query(default=0, ge=0, description="How many to skip"),
-    country: str = Query(default="", description="Part of the travel country"),
-) -> list[NewTravel]:
-    travel = dao_travel_agency.get_all_travels(limit=limit, skip=skip, country=country)
+def get_all_travels() -> list[NewTravel]:
+    travels = dao_travel_agency.get_all_travels()
+    return travels
+
+
+@api_router_travel_agency.get("/travels_by_price")
+def get_travels_by_price(price) -> list[NewTravel]:
+    travels = dao_travel_agency.get_travels_by_price(price=price)
+    return travels
+
+
+@api_router_travel_agency.get("/travels_by_country")
+def get_travels_by_country(country) -> list[NewTravel]:
+    travels = dao_travel_agency.get_travel_by_country(country=country)
+    return travels
+
+
+@api_router_travel_agency.get("/{travel_hotel_class_and_price}")
+def get_travels_by_hotel_class_and_price(price, hotel_class) -> list[NewTravel]:
+    travel = dao_travel_agency.get_travels_by_hotel_class_and_price(price=price, hotel_class=hotel_class)
     return travel
-
-
-@api_router_travel_agency.get("/{travel_id}")
-def get_travel(
-    travel_id: int = Path(gt=0, description="ID of the travel"),
-) -> NewTravel:
-    travel = dao_travel_agency.get_travel_by_id(travel_id=travel_id)
-    if travel:
-        return travel
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found")
 
 
 @api_router_travel_agency.put("/{travel_id}")
@@ -54,7 +58,7 @@ def update_travel(
 def delete_travel(
     travel_id: int = Path(gt=0, description="ID of the travel"),
 ) -> bool:
-    travel = dao_travel_agency.get_travel_by_id(travel_id=travel_id)
+    travel = dao_travel_agency.get_travel_by_id()
     if not travel:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found")
     dao_travel_agency.delete_travel(travel_id=travel_id)

@@ -1,14 +1,10 @@
-from fastapi import Request
-
 from fastapi import FastAPI
-from fastapi.templating import Jinja2Templates
 
 import config
-from api_router.api_travel_agenci import api_router_travel_agency
+from api_router.api_travel_agency_travels import api_router_travel_agency
+from api_router.api_travel_agency_users import api_router_travel_agency_users
 from database_travel_agency import create_tables
-from web_router.web_travel_agency import web_router
-
-templates = Jinja2Templates(directory="templates")
+from web_router.web_travel_agency_travels import web_router
 
 
 def lifespan(app: FastAPI):
@@ -24,3 +20,4 @@ app = FastAPI(
 
 app.include_router(api_router_travel_agency)
 app.include_router(web_router)
+app.include_router(api_router_travel_agency_users)

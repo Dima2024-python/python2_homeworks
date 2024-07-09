@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, HttpUrl
 
 
 class NewTravel(BaseModel):
@@ -7,7 +7,9 @@ class NewTravel(BaseModel):
     price: float = Field(ge=1.0, examples=[20000.96])
     date_start: str = Field(examples=["19:00, 09.06.2023"])
     date_end: str = Field(examples=["19:00, 09.06.2023"])
+    cover_url: HttpUrl
 
 
 class TravelId(NewTravel):
     id: int = Field(description="Number of your trip")
+

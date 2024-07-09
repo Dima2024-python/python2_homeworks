@@ -1,23 +1,42 @@
-from database_travel_agency import Travels, session
+import uuid
+
+from database_travel_agency import Travels, User, session
+from utils.utils_hashlib import get_password_hash
 
 
-def create_travel(country: str, hotel_class: float, price: float, date_start: str, date_end: str) -> Travels:
-    travel = Travels(country=country, hotel_class=hotel_class, price=price, date_start=date_start, date_end=date_end)
+def create_travel(country: str, hotel_class: float, price: float, date_start: str, date_end: str, cover_url) -> Travels:
+    travel = Travels(country=country,
+                     hotel_class=hotel_class,
+                     price=price, date_start=date_start,
+                     date_end=date_end,
+                     cover_url=str(cover_url),)
     session.add(travel)
     session.commit()
     return travel
 
 
-def get_all_travels(limit: int, skip: int, country: str) -> list[Travels]:
-    if country:
-        travel = session.query(Travels).filter(Travels.country.icontains(country)).limit(limit).offset(skip).all()
-    else:
-        travel = session.query(Travels).limit(limit).offset(skip).all()
-    return travel
+def get_all_travels() -> list[Travels]:
+    travels = session.query(Travels)
+    return travels
+
+
+def get_travels_by_hotel_class_and_price(hotel_class, price) -> list[Travels]:
+    travels = session.query(Travels).filter(Travels.price == price, Travels.hotel_class == hotel_class)
+    return travels
+
+
+def get_travels_by_price(price) -> list[Travels]:
+    travels = session.query(Travels).filter(Travels.price == price)
+    return travels
+
+
+def get_travel_by_country(country) -> list[Travels]:
+    travels = session.query(Travels).filter(Travels.country == country)
+    return travels
 
 
 def get_travel_by_id(travel_id) -> Travels | None:
-    travel = session.query(Travels).filter(Travels.id == travel_id).first()
+    travel = session.query(Travels).filter(Travels.id == travel_id)
     return travel
 
 
@@ -31,3 +50,35 @@ def update_travel(travel_id: int, travel_data: dict) -> Travels:
 def delete_travel(travel_id: int) -> None:
     session.query(Travels).filter(Travels.id == travel_id).delete()
     session.commit()
+
+
+def create_user(name: str, email: str, password: str) -> User:
+    user = User(
+        name=name,
+        email=email,
+        hashed_password=get_password_hash(password),
+    )
+    session.add(user)
+    session.commit()
+    return user
+
+
+def get_user_by_email(email: str) -> User | None:
+    query = session.query(User).filter(User.email == email).first()
+    return query
+
+
+def get_user_by_uuid(user_uuid: uuid.UUID) -> User | None:
+    query = session.query(User).filter(User.user_uuid == user_uuid).first()
+    return query
+
+
+def activate_account(user: User) -> User:
+    if user.is_verified:
+        return user
+    
+    user.is_verified = True
+    session.add(user)
+    session.commit()
+    session.refresh(user)
+    return user
