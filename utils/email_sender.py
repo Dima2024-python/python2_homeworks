@@ -5,6 +5,8 @@ from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
+import jinja2
+
 import config
 
 
@@ -43,3 +45,12 @@ def send_email(recipients: list[str], mail_subject: str, mail_body: str, attachm
     mail.login(USER, TOKEN_API)
     mail.sendmail(USER, recipients, msg.as_string())
     mail.quit()
+
+
+def create_welcome_letter(params: dict) -> str:
+    template_loader = jinja2.FileSystemLoader(searchpath='./')
+    template_env = jinja2.Environment(loader=template_loader)
+    template_file = 'templates/welcome_letter.html'
+    template = template_env.get_template(template_file)
+    output = template.render(params)
+    return output
