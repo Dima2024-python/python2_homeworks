@@ -1,6 +1,6 @@
 import uuid
 
-from fastapi import Query, Path, HTTPException, APIRouter, Request
+from fastapi import HTTPException, APIRouter, Request
 from starlette import status
 import dao_travel_agency
 

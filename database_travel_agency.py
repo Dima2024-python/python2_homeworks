@@ -1,6 +1,4 @@
-from datetime import datetime
-
-from sqlalchemy import DateTime, Column, Float, Integer, Sequence, Text, create_engine, String, UUID, Boolean
+from sqlalchemy import Column, Float, Integer, Sequence, Text, create_engine, String, UUID, Boolean
 from sqlalchemy.orm import declarative_base, sessionmaker
 
 import uuid

@@ -1,4 +1,4 @@
-from fastapi import Query, Path, HTTPException, APIRouter
+from fastapi import Path, HTTPException, APIRouter
 from starlette import status
 
 import dao_travel_agency
