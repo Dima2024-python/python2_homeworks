@@ -1,8 +1,28 @@
 {% extends 'base.html' %}
 
 
-  {% block content %}
+{% block content %}
+
+    {% for travel in travels %}
+
+      <div class="card" style="width: 18rem;">
+        <img src="{{travel.cover_url}}" class="card-img-top" alt="...">
+        <div class="card-body">
+          <h5 class="card-title">{{ travel.country }}</h5>
+          <p class="card-text">Подорож до {{ travel.country }} за рейтингами дуже захоплює, діють знижки</p>
+          <a href="{{ url_for('get_travel_by_id_web', travel_id=travel.id) }}" class="btn btn-primary">Деталі по подорожі</a>
+            {% if user %}
 
 
+          <form method="post" action="{{ url_for('add_travel_to_cart', travel_id=travel.id) }}">
+            <button type="submit" class="btn btn-success">Купити квиток</button>
+          </form>
 
-  {% endblock %}
+
+            {% endif %}
+        </div>
+      </div>
+
+    {% endfor %}
+
+{% endblock %}

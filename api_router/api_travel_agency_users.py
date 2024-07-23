@@ -1,9 +1,10 @@
 import uuid
 
-from fastapi import HTTPException, APIRouter, Request
+from fastapi import HTTPException, APIRouter, Request, BackgroundTasks
 from starlette import status
 import dao_travel_agency
 
+from background_tasks_travel_agency.confirm_registration import confirm_registration
 from schemas_travel_agency_users import RegisterUserRequest, NewUser
 from utils.email_sender import create_welcome_letter, send_email
 
@@ -15,18 +16,17 @@ api_router_travel_agency_users = APIRouter(
 
 
 @api_router_travel_agency_users.post("/verify/", status_code=status.HTTP_201_CREATED)
-def create_user(request: Request, new_user: RegisterUserRequest) -> NewUser:
-    print(request.__dict__)
+def create_user(
+        request: Request,
+        new_user: RegisterUserRequest,
+        background_tasks: BackgroundTasks
+) -> NewUser:
     maybe_user = dao_travel_agency.get_user_by_email(new_user.email)
     if maybe_user:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail='Email already exists')
 
     created_user = dao_travel_agency.create_user(**new_user.dict())
-    email_body = create_welcome_letter({
-        'name': created_user.name,
-        'link': f'{request.base_url}api/users/verify/{created_user.user_uuid}'
-    })
-    send_email([created_user.email], mail_body=email_body, mail_subject='Verification')
+    background_tasks.add_task(confirm_registration, created_user, request.base_url)
     return created_user
 
 
