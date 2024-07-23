@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+
+<div class="container">
+
+
+
+        <div class="card" style="width: 18rem;">
+          <img src="{{ travel.cover_url }}" class="card-img-top" alt="...">
+          <div class="card-body">
+            <h5 class="card-title">{{ travel.country }}</h5>
+            <p class="card-text">Подорож за ціною {{ travel.price }} з {{ travel.hotel_class }} зірковим готелем. Дата виїзду {{ travel.date_start }}. Якщо зацікавила подорож - телефонуйте сюди -> 068 928 3050</p>
+
+          </div>
+        </div>
+
+
+
+
+</div>
+{% endblock %}

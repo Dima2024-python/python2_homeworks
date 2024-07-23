@@ -8,6 +8,7 @@ class NewTravel(BaseModel):
     date_start: str = Field(examples=["19:00, 09.06.2023"])
     date_end: str = Field(examples=["19:00, 09.06.2023"])
     cover_url: HttpUrl
+    ticket_quantity: int = Field(ge=0, examples=['12'])
 
 
 class TravelId(NewTravel):

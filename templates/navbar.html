@@ -1,38 +1,46 @@
-
-<nav class="navbar navbar-expand-lg bg-body-tertiary">
+<nav class="navbar navbar-expand-lg bg-body-tertiary" xmlns="http://www.w3.org/1999/html">
   <div class="container-fluid">
-    <a class="navbar-brand" href="http://127.0.0.1:8000/">Home</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="http://127.0.0.1:8000/docs#/Users/create_user_api_users_verify__post">Verify</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="http://127.0.0.1:8000/docs#/API/create_travel_api_travels_create__post">Create travel</a>
-        </li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            SEARCH TRAVELS
-          </a>
-          <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="http://127.0.0.1:8000/docs#/API%20Travels/get_all_travels_api_travels__get">Search all travels</a></li>
-            <li><a class="dropdown-item" href="http://127.0.0.1:8000/docs#/API%20Travels/get_travels_by_country_api_travels_travels_by_country_get">Search travel by country</a></li>
-            <li><a class="dropdown-item" href="http://127.0.0.1:8000/docs#/API%20Travels/get_travels_by_price_api_travels_travels_by_price_get">Search travel by price</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="http://127.0.0.1:8000/docs#/API%20Travels/get_travels_by_hotel_class_and_price_api_travels__travel_hotel_class_and_price__get">Search travel by country and hotel class</a></li>
-          </ul>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link disabled" aria-disabled="true">Disabled</a>
+            <a class="nav-link active" aria-current="page" href="{{ url_for('index_web') }}">Головна</a>
         </li>
       </ul>
+
       <form class="d-flex" role="search">
-        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-        <button class="btn btn-outline-success" type="submit">Search</button>
+        <input class="form-control me-2" type="search" name="query" placeholder="введіть назву товару" aria-label="Search">
+        <button class="btn btn-outline-success" type="submit">Пошук</button>
       </form>
+
+      {% if not user %}
+      <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="{{ url_for('web_register') }}">Зареєструватися</a>
+        </li>
+      </ul>
+      <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="{{ url_for('web_login') }}">Залогінитися</a>
+        </li>
+      </ul>
+      {% else %}
+         </ul>
+      <ul class="navbar-nav">
+        <li class="nav-item">
+            <p class="nav-link active" >Вітаємо тебе, {{ user.name }}</p>
+        </li>
+      </ul>
+
+      <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="{{ url_for('web_logout') }}">Розлогінитись</a>
+        </li>
+      </ul>
+      {% endif %}
+
     </div>
   </div>
 </nav>
