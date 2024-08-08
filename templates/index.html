@@ -12,9 +12,8 @@
           <p class="card-text">Подорож до {{ travel.country }} за рейтингами дуже захоплює, діють знижки</p>
           <a href="{{ url_for('get_travel_by_id_web', travel_id=travel.id) }}" class="btn btn-primary">Деталі по подорожі</a>
             {% if user %}
-
-
-          <form method="post" action="{{ url_for('add_travel_to_cart', travel_id=travel.id) }}">
+              <form method="post" action="{{ url_for('add_travel_to_cart') }}">
+              <input type="number" name="travel_id" value="{{travel.id}}" hidden="">
             <button type="submit" class="btn btn-success">Купити квиток</button>
           </form>
 

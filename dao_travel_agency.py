@@ -1,6 +1,10 @@
 import uuid
 
-from database_travel_agency import Travels, User, session
+from sqlalchemy import select
+from sqlalchemy.orm import joinedload
+
+from database_travel_agency import Travels, User, session, OrderTravels
+from fastapi import HTTPException
 from utils.utils_hashlib import get_password_hash
 
 
@@ -38,6 +42,7 @@ def get_travel_by_country(country) -> list[Travels]:
 
 def get_travel_by_id(travel_id) -> Travels | None:
     travel = session.query(Travels).filter(Travels.id == travel_id).first()
+    print(999999999999999999999999999999999, travel)
     return travel
 
 
@@ -68,8 +73,8 @@ def create_user(name: str, email: str, password: str) -> User:
 
 
 def get_user_by_email(email: str) -> User | None:
-    query = session.query(User).filter(User.email == email).first()
-    return query
+    user = session.query(User).filter(User.email == email).first()
+    return user
 
 
 def get_user_by_uuid(user_uuid: uuid.UUID | str) -> User | None:
@@ -86,3 +91,25 @@ def activate_account(user: User) -> User:
     session.commit()
     session.refresh(user)
     return user
+
+
+def get_or_create(model, **kwargs):
+    query = select(model).filter_by(**kwargs)
+    instance = session.execute(query).scalar_one_or_none()
+    if instance:
+        print(55555555555555555555555555, instance)
+        return instance
+
+    instance = model(**kwargs)
+    session.add(instance)
+    session.commit()
+    return instance
+
+
+def fetch_order_travels(order_id: int) -> list:
+    query = select(OrderTravels).filter(
+        OrderTravels.order_id == order_id
+    ).options(joinedload(OrderTravels.travel))
+    result = session.execute(query).scalars().all()
+    print(6666666666666666666666666, result)
+    return result
