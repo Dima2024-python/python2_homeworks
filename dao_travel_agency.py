@@ -1,8 +1,9 @@
 import uuid
 
+from sqlalchemy.orm import joinedload
 from sqlalchemy import select
 
-from database_travel_agency import Travel, session, User
+from database_travel_agency import Travel, session, User, OrderTravel
 from utils.utils_hashlib import get_password_hash
 
 
@@ -100,3 +101,23 @@ def activate_account(user: User) -> User:
     session.commit()
     session.refresh(user)
     return user
+
+
+def get_or_create(model, **kwargs):
+    query = select(model).filter_by(**kwargs)
+    instance = session.execute(query).scalar_one_or_none()
+    if instance:
+        return instance
+
+    instance = model(**kwargs)
+    session.add(instance)
+    session.commit()
+    return instance
+
+
+def fetch_order_travels(order_id: int) -> list:
+    query = select(OrderTravel).filter(
+        OrderTravel.order_id == order_id
+    ).options(joinedload(OrderTravel.travel))
+    result = session.execute(query).scalars().all()
+    return result

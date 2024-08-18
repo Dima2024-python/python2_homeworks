@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+
+<div class="container">
+    <div class="row pt-2 pb-2 container">
+
+
+        <table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Країна</th>
+      <th scope="col">Кількість квитків</th>
+      <th scope="col">Загальна вартість подорожі</th>
+    </tr>
+  </thead>
+  <tbody>
+
+  {% for order_product in cart %}
+    <tr>
+      <td>{{ order_product.travel.name }}</td>
+      <td>{{ order_product.quantity }}</td>
+      <td>{{ order_product.cost }}</td>
+    </tr>
+
+    {% endfor %}
+
+  </tbody>
+</table>
+
+
+    </div>
+</div>
+{% endblock %}
