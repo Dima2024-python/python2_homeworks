@@ -25,7 +25,7 @@ def index(request: Request, user=Depends(get_user_web)):
     context = {
         'request': request,
         'travels': get_all_travel(25, 0),
-        'search': False,
+        'navbar': 'default',
         'title': 'Main page',
         'user': user
     }
@@ -39,9 +39,9 @@ def search(request: Request):
     context = {
         'request': request,
         'travels': dao_travel_agency.get_all_travel(20, 0),
-        'search': True,
+        'navbar': 'search',
         "title": 'Search'}
-    return templates.TemplateResponse("index.html", context=context)
+    return templates.TemplateResponse("index_search.html", context=context)
 
 
 @web_router.get("/search_by_country", include_in_schema=True)
@@ -49,11 +49,11 @@ def search(request: Request):
 def search_by_country(request: Request, query: str = Form(None)):
     context = {
         "request": request,
-        'search': True,
+        'navbar': 'search',
         "travels": dao_travel_agency.get_travel_by_country(query),
         "title": "Search",
     }
-    response = templates.TemplateResponse("index.html", context=context)
+    response = templates.TemplateResponse("index_search.html", context=context)
     return response
 
 
@@ -61,11 +61,11 @@ def search_by_country(request: Request, query: str = Form(None)):
 def get_all_travels(request: Request):
     context = {
         "request": request,
-        'search': True,
+        'navbar': 'search',
         "travels": dao_travel_agency.get_all_travel(50, 0),
         "title": "Search",
     }
-    response = templates.TemplateResponse("index.html", context=context)
+    response = templates.TemplateResponse("index_search.html", context=context)
     return response
 
 
@@ -74,11 +74,11 @@ def get_all_travels(request: Request):
 def search_by_price(request: Request, query: float = Form(None)):
     context = {
         "request": request,
-        'search': True,
+        'navbar': 'search',
         "travels": dao_travel_agency.get_travel_by_price(query),
         "title": "Search",
     }
-    response = templates.TemplateResponse("index.html", context=context)
+    response = templates.TemplateResponse("index_search.html", context=context)
     return response
 
 
@@ -87,11 +87,11 @@ def search_by_price(request: Request, query: float = Form(None)):
 def search_by_hotel_class(request: Request, query: int = Form(None)):
     context = {
         "request": request,
-        'search': True,
+        'navbar': 'search',
         "travels": dao_travel_agency.get_travel_by_hotel_class(query),
         "title": "Search",
     }
-    response = templates.TemplateResponse("index.html", context=context)
+    response = templates.TemplateResponse("index_search.html", context=context)
     return response
 
 
@@ -114,7 +114,7 @@ def web_register(
     if request.method == 'GET':
         context = {
             'request': request,
-            'search': False,
+            'navbar': 'default',
             'title': 'Register'
         }
         return templates.TemplateResponse('registration.html', context=context)
@@ -123,7 +123,7 @@ def web_register(
     context = {
         'request': request,
         'title': 'Register',
-        'search': False,
+        'navbar': 'default',
         'travels': get_all_travel(25, 0),
         'user': maybe_user
     }
@@ -156,7 +156,7 @@ def web_login(
     if request.method == 'GET':
         context = {
             'request': request,
-            'search': False,
+            'navbar': 'default',
             'title': 'Login'
         }
         return templates.TemplateResponse('login.html', context=context)
@@ -168,7 +168,7 @@ def web_login(
             'request': request,
             'title': 'Login',
             'error': True,
-            'search': False,
+            'navbar': 'default',
             'email_value': email
         }
         return templates.TemplateResponse('login.html', context=context)
@@ -177,7 +177,7 @@ def web_login(
         context = {
             'request': request,
             'title': 'Register',
-            'search': False,
+            'navbar': 'default',
             'travels': get_all_travel(25, 0),
             'user': maybe_user
         }
@@ -188,7 +188,7 @@ def web_login(
     context = {
         'request': request,
         'title': 'Login',
-        'search': False,
+        'navbar': 'default',
         'error': True,
         'email_value': email
     }
@@ -202,10 +202,25 @@ def web_logout(
     context = {
         'request': request,
         'travels': get_all_travel(25, 0),
-        'search': False,
+        'navbar': 'default',
         'title': 'Main page',
         'user': None
     }
     response = templates.TemplateResponse('index.html', context=context)
     response.delete_cookie('token_user_hillel')
     return response
+
+
+@web_router.get("/travel/{travel_id}", include_in_schema=True)
+def get_travel_by_id_web(request: Request, travel_id: int, user=Depends(get_user_web)):
+    travel = dao_travel_agency.get_travel_by_id(travel_id)
+    context = {
+        "request": request,
+        "travel": travel,
+        'navbar': 'None',
+        "title": "Details",
+        "user": user,
+    }
+    response = templates.TemplateResponse("details.html", context=context)
+    response_with_cookies = set_cookies_web(user, response)
+    return response_with_cookies

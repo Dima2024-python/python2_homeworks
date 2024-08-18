@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+ {% block content %}
+
+<div class="container">
+    <div class="row pt-2 pb-1 container">
+
+  {% for travel in travels %}
+
+
+<div class="card border-warning mb-3" style="max-width: 630px;">
+  <div class="col">
+    <div class="card">
+      <img src="{{travel.image}}" class="card-img-top" alt="...">
+      <div class="card-body">
+        <h5 class="card-title">{{travel.title}}</h5>
+          <h4 class="card-title">{{travel.price}}грн</h4>
+        <a href="{{ url_for('get_travel_by_id_web', travel_id=travel.id) }}" class="btn btn-primary">Детальніше</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+  {% endfor %}
+
+        </div>
+</div>
+
+    {% endblock %}

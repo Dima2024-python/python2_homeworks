@@ -2,37 +2,42 @@
  {% block content %}
 
 <div class="container">
-    <div class="row pt-2 pb-2 container">
+    <div class="row pt-2 pb-1 container">
 
-    {% for travel in travels %}
+  {% for travel in travels %}
 
-    <div class="card" style="width: 18rem;">
-  <img src="{{travel.image}}" class="card-img-top" alt="...">
-  <div class="card-body">
-    <h5 class="card-title">{{travel.title}}</h5>
-    <p class="card-text">{{travel.description}}</p>
-  </div>
-  <ul class="list-group list-group-flush">
-    <li class="list-group-item">Ціна подорожі {{travel.price}}грн</li>
-    <li class="list-group-item">Клас готелю {{travel.hotel_class}}☆</li>
-    <li class="list-group-item">Дата виїзду {{travel.date_start}}</li>
-    <li class="list-group-item">Дата приїзду {{travel.date_end}}</li>
-  </ul>
-  <div class="card-body">
-    <button type="button" class="btn btn-success">Придбати квиток</button>
-    <button type="button" class="btn btn-warning">Додати в кошик</button>
+
+<div class="card border-warning mb-3" style="max-width: 540px;">
+  <div class="row g-0">
+    <div class="col-md-4">
+      <img src="{{travel.image}}" class="img-fluid rounded-start" alt="...">
+    </div>
+    <div class="col-md-8">
+      <div class="card-body">
+        <h3 class="card-title">{{travel.country}}</h3>
+        <h5 class="card-text">Маємо квитки на подоров в такі країни</h5>
+        <p class="card-text"><small class="text-body-secondary">Last updated 3 mins ago</small></p>
+      </div>
+    </div>
   </div>
 </div>
 
 
-    {% endfor %}
+  {% endfor %}
 
-
-
-
-
-
-    </div>
+        </div>
 </div>
 
     {% endblock %}
+<div class="row row-cols-1 row-cols-md-2 g-4" style="max-width: 1300px;">
+  <div class="col">
+    <div class="card">
+      <img src="{{travel.image}}" class="card-img-top" alt="...">
+      <div class="card-body">
+        <h5 class="card-title">{{travel.title}}</h5>
+          <h4 class="card-title">{{travel.price}}грн</h4>
+        <a href="{{ url_for('get_travel_by_id_web', travel_id=travel.id) }}" class="btn btn-primary">Детальніше</a>
+      </div>
+    </div>
+  </div>
+</div>

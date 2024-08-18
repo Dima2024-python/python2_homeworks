@@ -6,7 +6,7 @@
     </button>
     <ul class="navbar-nav">
         <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="{{ url_for('search') }}">Пошук подорожей</a>
+            <a class="btn btn-secondary" aria-current="page" href="{{ url_for('search') }}">Пошук подорожей</a>
         </li>
       </ul>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
@@ -28,7 +28,7 @@
          </ul>
       <ul class="navbar-nav">
         <li class="nav-item">
-            <p class="nav-link active" >Вітаємо тебе, {{ user.name }}</p>
+            <p class="nav-link active" aria-current="page">Вітаємо тебе, {{ user.name }}</p>
         </li>
       </ul>
 

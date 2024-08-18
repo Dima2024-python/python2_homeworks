@@ -4,7 +4,7 @@
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
-      <a class="btn btn-warning" href="{{ url_for('get_all_travels') }}">Всі подорожі</a>
+      <a class="btn btn-secondary" href="{{ url_for('get_all_travels') }}">Всі подорожі</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -14,7 +14,7 @@
 
        <form class="d-flex" role="search" method="post" action="{{ url_for('search_by_country') }}">
         <input class="form-control me-2" type="search" name="query" placeholder="введіть країну подорожі" aria-label="Search">
-        <button class="btn btn-outline-success" type="submit">Пошук за країною</button>
+        <button class="btn btn-outline-danger" type="submit">Пошук за країною</button>
       </form>
        <form class="d-flex" role="search" method="post" action="{{ url_for('search_by_price') }}">
         <input class="form-control me-2" type="search" name="query" placeholder="введіть ціну" aria-label="Search">
@@ -22,7 +22,7 @@
       </form>
        <form class="d-flex" role="search" method="post" action="{{ url_for('search_by_hotel_class') }}">
         <input class="form-control me-2" type="search" name="query" placeholder="введіть клас готеля" aria-label="Search">
-        <button class="btn btn-outline-success" type="submit">Пошук за класом готелю</button>
+        <button class="btn btn-outline-warning" type="submit">Пошук за класом готелю</button>
       </form>
     </div>
   </div>
