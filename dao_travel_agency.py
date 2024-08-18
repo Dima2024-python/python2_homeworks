@@ -1,56 +1,70 @@
 import uuid
 
-from database_travel_agency import Travels, User, session
+from sqlalchemy import select
+
+from database_travel_agency import Travel, session, User
 from utils.utils_hashlib import get_password_hash
 
 
-def create_travel(country: str, hotel_class: float, price: float, date_start: str, date_end: str, cover_url, ticket_quantity: int) -> Travels:
-    travel = Travels(country=country,
-                     hotel_class=hotel_class,
-                     price=price, date_start=date_start,
-                     date_end=date_end,
-                     cover_url=str(cover_url),
-                     ticket_quantity=ticket_quantity)
+def create_travel(
+    title: str, description: str, price: float, country: str, image, hotel_class: int, date_start, date_end
+) -> Travel:
+    travel = Travel(
+        title=title,
+        country=country,
+        description=description,
+        price=price,
+        hotel_class=hotel_class,
+        image=str(image),
+        date_start=date_start,
+        date_end=date_end,
+    )
     session.add(travel)
     session.commit()
     return travel
 
 
-def get_all_travels(limit: int, skip: int) -> list[Travels]:
-    travels = session.query(Travels).filter(Travels.ticket_quantity > 0).limit(limit).offset(skip).all()
+def get_all_travel(limit: int, skip: int, title: str | None = None) -> list[Travel]:
+    if title:
+        travels = session.query(Travel).filter(Travel.title.icontains(title)).limit(limit).offset(skip).all()
+    else:
+        travels = session.query(Travel).limit(limit).offset(skip).all()
     return travels
 
 
-def get_travels_by_hotel_class_and_price(hotel_class, price) -> list[Travels]:
-    travels = session.query(Travels).filter(Travels.price == price, Travels.hotel_class == hotel_class)
-    return travels
-
-
-def get_travels_by_price(price) -> list[Travels]:
-    travels = session.query(Travels).filter(Travels.price == price)
-    return travels
-
-
-def get_travel_by_country(country) -> list[Travels]:
-    travels = session.query(Travels).filter(Travels.country == country)
-    return travels
-
-
-def get_travel_by_id(travel_id) -> Travels | None:
-    travel = session.query(Travels).filter(Travels.id == travel_id).first()
+def get_travel_by_id(travel_id) -> Travel | None:
+    travel = session.query(Travel).filter(Travel.id == travel_id).first()
     return travel
 
 
-def update_travel(travel_id: int, travel_data: dict) -> Travels:
-    session.query(Travels).filter(Travels.id == travel_id).update(travel_data)
+def delete_travel(travel_id) -> None:
+    session.query(Travel).filter(Travel.id == travel_id).delete()
     session.commit()
-    travel = session.query(Travels).filter(Travels.id == travel_id).first()
+
+
+def get_travel_by_country(travel_country) -> list[Travel]:
+    travel = session.query(Travel).filter(Travel.country == travel_country).all()
     return travel
 
 
-def delete_travel(travel_id: int) -> None:
-    session.query(Travels).filter(Travels.id == travel_id).delete()
+def get_travel_by_price(travel_price) -> list[Travel]:
+    travel = session.query(Travel).filter(Travel.price == travel_price).all()
+    print(travel, 999999999999999999999999999)
+    return travel
+
+
+def get_travel_by_hotel_class(travel_hotel_class) -> list[Travel]:
+    travel = session.query(Travel).filter(Travel.hotel_class == travel_hotel_class).all()
+    print(travel, 7777777777777777777777)
+    return travel
+
+
+def update_travel(travel_id: int, travel_data: dict) -> Travel:
+    travel_data['image'] = str(travel_data['image'])
+    session.query(Travel).filter(Travel.id == travel_id).update(travel_data)
     session.commit()
+    travel = session.query(Travel).filter(Travel.id == travel_id).first()
+    return travel
 
 
 def create_user(name: str, email: str, password: str) -> User:
@@ -68,8 +82,8 @@ def create_user(name: str, email: str, password: str) -> User:
 
 
 def get_user_by_email(email: str) -> User | None:
-    query = session.query(User).filter(User.email == email).first()
-    return query
+    user = session.query(User).filter(User.email == email).first()
+    return user
 
 
 def get_user_by_uuid(user_uuid: uuid.UUID | str) -> User | None:

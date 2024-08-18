@@ -1,28 +1,38 @@
 {% extends 'base.html' %}
+ {% block content %}
 
-
-{% block content %}
+<div class="container">
+    <div class="row pt-2 pb-2 container">
 
     {% for travel in travels %}
 
-      <div class="card" style="width: 18rem;">
-        <img src="{{travel.cover_url}}" class="card-img-top" alt="...">
-        <div class="card-body">
-          <h5 class="card-title">{{ travel.country }}</h5>
-          <p class="card-text">Подорож до {{ travel.country }} за рейтингами дуже захоплює, діють знижки</p>
-          <a href="{{ url_for('get_travel_by_id_web', travel_id=travel.id) }}" class="btn btn-primary">Деталі по подорожі</a>
-            {% if user %}
+    <div class="card" style="width: 18rem;">
+  <img src="{{travel.image}}" class="card-img-top" alt="...">
+  <div class="card-body">
+    <h5 class="card-title">{{travel.title}}</h5>
+    <p class="card-text">{{travel.description}}</p>
+  </div>
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item">Ціна подорожі {{travel.price}}грн</li>
+    <li class="list-group-item">Клас готелю {{travel.hotel_class}}☆</li>
+    <li class="list-group-item">Дата виїзду {{travel.date_start}}</li>
+    <li class="list-group-item">Дата приїзду {{travel.date_end}}</li>
+  </ul>
+  <div class="card-body">
+    <button type="button" class="btn btn-success">Придбати квиток</button>
+    <button type="button" class="btn btn-warning">Додати в кошик</button>
+  </div>
+</div>
 
-
-          <form method="post" action="{{ url_for('add_travel_to_cart', travel_id=travel.id) }}">
-            <button type="submit" class="btn btn-success">Купити квиток</button>
-          </form>
-
-
-            {% endif %}
-        </div>
-      </div>
 
     {% endfor %}
 
-{% endblock %}
+
+
+
+
+
+    </div>
+</div>
+
+    {% endblock %}

@@ -6,7 +6,7 @@ from fastapi.responses import RedirectResponse
 
 import dao_travel_agency
 from background_tasks_travel_agency.confirm_registration import confirm_registration
-from dao_travel_agency import get_all_travels
+from dao_travel_agency import get_all_travel
 from utils.jwt_auth import set_cookies_web, get_user_web
 from utils.utils_hashlib import verify_password
 
@@ -20,10 +20,12 @@ web_router = APIRouter(
 
 @web_router.get('/', include_in_schema=True)
 @web_router.post('/', include_in_schema=True)
-def index_web(request: Request, user=Depends(get_user_web), query: str = Form(None)):
+def index(request: Request, user=Depends(get_user_web)):
+    print(999999999999999999)
     context = {
         'request': request,
-        'travels': get_all_travels(25, 0),
+        'travels': get_all_travel(25, 0),
+        'search': False,
         'title': 'Main page',
         'user': user
     }
@@ -32,25 +34,65 @@ def index_web(request: Request, user=Depends(get_user_web), query: str = Form(No
     return response_with_cookies
 
 
-@web_router.get('/travel/{travel_id}', include_in_schema=True)
-def get_travel_by_id_web(request: Request,  travel_id: int, user=Depends(get_user_web)):
-    travel = dao_travel_agency.get_travel_by_id(travel_id)
+@web_router.get('/search')
+def search(request: Request):
     context = {
         'request': request,
-        'travel': travel,
-        'title': f'Дані про подорож',
-        'user': user,
+        'travels': dao_travel_agency.get_all_travel(20, 0),
+        'search': True,
+        "title": 'Search'}
+    return templates.TemplateResponse("index.html", context=context)
 
+
+@web_router.get("/search_by_country", include_in_schema=True)
+@web_router.post("/search_by_country", include_in_schema=True)
+def search_by_country(request: Request, query: str = Form(None)):
+    context = {
+        "request": request,
+        'search': True,
+        "travels": dao_travel_agency.get_travel_by_country(query),
+        "title": "Search",
     }
-    response = templates.TemplateResponse('details.html', context=context)
-    response_with_cookies = set_cookies_web(user, response)
-    return response_with_cookies
+    response = templates.TemplateResponse("index.html", context=context)
+    return response
 
 
-@web_router.post('/add-travel-to-cart/')
-def add_travel_to_cart(travel_id: int):
-    print(99999999999999, travel_id)
-    pass
+@web_router.get("/get_all_travels", include_in_schema=True)
+def get_all_travels(request: Request):
+    context = {
+        "request": request,
+        'search': True,
+        "travels": dao_travel_agency.get_all_travel(50, 0),
+        "title": "Search",
+    }
+    response = templates.TemplateResponse("index.html", context=context)
+    return response
+
+
+@web_router.get("/search_by_price", include_in_schema=True)
+@web_router.post("/search_by_price", include_in_schema=True)
+def search_by_price(request: Request, query: float = Form(None)):
+    context = {
+        "request": request,
+        'search': True,
+        "travels": dao_travel_agency.get_travel_by_price(query),
+        "title": "Search",
+    }
+    response = templates.TemplateResponse("index.html", context=context)
+    return response
+
+
+@web_router.get("/search_by_hotel_class", include_in_schema=True)
+@web_router.post("/search_by_hotel_class", include_in_schema=True)
+def search_by_hotel_class(request: Request, query: int = Form(None)):
+    context = {
+        "request": request,
+        'search': True,
+        "travels": dao_travel_agency.get_travel_by_hotel_class(query),
+        "title": "Search",
+    }
+    response = templates.TemplateResponse("index.html", context=context)
+    return response
 
 
 @web_router.get('/register/', include_in_schema=True)
@@ -64,7 +106,7 @@ def web_register(
         user=Depends(get_user_web)
 ):
     if user:
-        redirect_url = request.url_for('index_web')
+        redirect_url = request.url_for('index')
         response = RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
         response_with_cookies = set_cookies_web(user, response)
         return response_with_cookies
@@ -72,6 +114,7 @@ def web_register(
     if request.method == 'GET':
         context = {
             'request': request,
+            'search': False,
             'title': 'Register'
         }
         return templates.TemplateResponse('registration.html', context=context)
@@ -80,7 +123,8 @@ def web_register(
     context = {
         'request': request,
         'title': 'Register',
-        'travels': get_all_travels(25, 0),
+        'search': False,
+        'travels': get_all_travel(25, 0),
         'user': maybe_user
     }
     if not maybe_user:
@@ -89,7 +133,7 @@ def web_register(
         context['user'] = created_user
 
     # response = templates.TemplateResponse('index.html', context=context)
-    redirect_url = request.url_for('index_web')
+    redirect_url = request.url_for('index')
     response = RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
     response_with_cookies = set_cookies_web(context['user'], response)
     return response_with_cookies
@@ -104,7 +148,7 @@ def web_login(
         user=Depends(get_user_web)
 ):
     if user:
-        redirect_url = request.url_for('index_web')
+        redirect_url = request.url_for('index')
         response = RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
         response_with_cookies = set_cookies_web(user, response)
         return response_with_cookies
@@ -112,6 +156,7 @@ def web_login(
     if request.method == 'GET':
         context = {
             'request': request,
+            'search': False,
             'title': 'Login'
         }
         return templates.TemplateResponse('login.html', context=context)
@@ -123,6 +168,7 @@ def web_login(
             'request': request,
             'title': 'Login',
             'error': True,
+            'search': False,
             'email_value': email
         }
         return templates.TemplateResponse('login.html', context=context)
@@ -131,7 +177,8 @@ def web_login(
         context = {
             'request': request,
             'title': 'Register',
-            'travels': get_all_travels(25, 0),
+            'search': False,
+            'travels': get_all_travel(25, 0),
             'user': maybe_user
         }
         response = templates.TemplateResponse('index.html', context=context)
@@ -141,6 +188,7 @@ def web_login(
     context = {
         'request': request,
         'title': 'Login',
+        'search': False,
         'error': True,
         'email_value': email
     }
@@ -153,7 +201,8 @@ def web_logout(
 ):
     context = {
         'request': request,
-        'travels': get_all_travels(25, 0),
+        'travels': get_all_travel(25, 0),
+        'search': False,
         'title': 'Main page',
         'user': None
     }

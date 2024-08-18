@@ -45,7 +45,7 @@ def set_cookies_web(user, response: RedirectResponse) -> RedirectResponse:
 
 
 def get_user_web(request: Request) -> User | None:
-    token = request.cookies.get('token_user_hillel')
+    token = request.cookies.get("token_user_hillel")
 
     if not token:
         return
@@ -53,5 +53,5 @@ def get_user_web(request: Request) -> User | None:
     user_data = decode_jwt(token)
     if not user_data:
         return
-    user = dao_travel_agency.get_user_by_email(user_data['sub'])
+    user = dao_travel_agency.get_user_by_email(user_data["sub"])
     return user
