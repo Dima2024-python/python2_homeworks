@@ -6,12 +6,11 @@ import dao_travel_agency
 
 from background_tasks_travel_agency.confirm_registration import confirm_registration
 from schemas_travel_agency_users import RegisterUserRequest, NewUser
-from utils.email_sender import create_welcome_letter, send_email
 
 
 api_router_travel_agency_users = APIRouter(
     prefix='/api/users',
-    tags=["API Users"]
+    tags=["Users"]
 )
 
 
