@@ -1,21 +1,18 @@
 <nav class="navbar navbar-expand-lg bg-body-tertiary">
   <div class="container-fluid">
-      <a class="navbar-brand" href="{{ url_for('index') }}">На головну</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-      <a class="btn btn-secondary" href="{{ url_for('get_all_travels') }}">Всі подорожі</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-      </ul>
+
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSk4WIrhKDwGxROUoOqp1xZbhEgQYUCRH38GQ&s" style="max-width: 70px;">
+
+      <a class="navbar-brand"></a>
+      <a class="navbar-brand" href="{{ url_for('index') }}">На головну🏠</a>
+
+      <a class="btn btn-outline-secondary" href="{{ url_for('get_all_travels') }}">Всі подорожі</a>
 
        <form class="d-flex" role="search" method="post" action="{{ url_for('search_by_country') }}">
         <input class="form-control me-2" type="search" name="query" placeholder="введіть країну подорожі" aria-label="Search">
         <button class="btn btn-outline-danger" type="submit">Пошук за країною</button>
       </form>
+
        <form class="d-flex" role="search" method="post" action="{{ url_for('search_by_price') }}">
         <input class="form-control me-2" type="search" name="query" placeholder="введіть ціну" aria-label="Search">
         <button class="btn btn-outline-success" type="submit">Пошук за ціною</button>

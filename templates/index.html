@@ -29,15 +29,3 @@
 </div>
 
     {% endblock %}
-<div class="row row-cols-1 row-cols-md-2 g-4" style="max-width: 1300px;">
-  <div class="col">
-    <div class="card">
-      <img src="{{travel.image}}" class="card-img-top" alt="...">
-      <div class="card-body">
-        <h5 class="card-title">{{travel.title}}</h5>
-          <h4 class="card-title">{{travel.price}}грн</h4>
-        <a href="{{ url_for('get_travel_by_id_web', travel_id=travel.id) }}" class="btn btn-primary">Детальніше</a>
-      </div>
-    </div>
-  </div>
-</div>

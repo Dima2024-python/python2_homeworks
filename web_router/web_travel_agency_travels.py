@@ -9,6 +9,7 @@ from background_tasks_travel_agency.confirm_registration import confirm_registra
 from dao_travel_agency import get_all_travel
 from utils.jwt_auth import set_cookies_web, get_user_web
 from utils.utils_hashlib import verify_password
+from database_travel_agency import Order, OrderTravel, session
 
 templates = Jinja2Templates(directory="templates")
 
@@ -35,21 +36,23 @@ def index(request: Request, user=Depends(get_user_web)):
 
 
 @web_router.get('/search')
-def search(request: Request):
+def search(request: Request, user=Depends(get_user_web)):
     context = {
         'request': request,
         'travels': dao_travel_agency.get_all_travel(20, 0),
         'navbar': 'search',
+        'user': user,
         "title": 'Search'}
     return templates.TemplateResponse("index_search.html", context=context)
 
 
 @web_router.get("/search_by_country", include_in_schema=True)
 @web_router.post("/search_by_country", include_in_schema=True)
-def search_by_country(request: Request, query: str = Form(None)):
+def search_by_country(request: Request, query: str = Form(None), user=Depends(get_user_web)):
     context = {
         "request": request,
         'navbar': 'search',
+        'user': user,
         "travels": dao_travel_agency.get_travel_by_country(query),
         "title": "Search",
     }
@@ -58,10 +61,11 @@ def search_by_country(request: Request, query: str = Form(None)):
 
 
 @web_router.get("/get_all_travels", include_in_schema=True)
-def get_all_travels(request: Request):
+def get_all_travels(request: Request, user=Depends(get_user_web)):
     context = {
         "request": request,
         'navbar': 'search',
+        'user': user,
         "travels": dao_travel_agency.get_all_travel(50, 0),
         "title": "Search",
     }
@@ -71,10 +75,11 @@ def get_all_travels(request: Request):
 
 @web_router.get("/search_by_price", include_in_schema=True)
 @web_router.post("/search_by_price", include_in_schema=True)
-def search_by_price(request: Request, query: float = Form(None)):
+def search_by_price(request: Request, query: float = Form(None), user=Depends(get_user_web)):
     context = {
         "request": request,
         'navbar': 'search',
+        'user': user,
         "travels": dao_travel_agency.get_travel_by_price(query),
         "title": "Search",
     }
@@ -84,10 +89,11 @@ def search_by_price(request: Request, query: float = Form(None)):
 
 @web_router.get("/search_by_hotel_class", include_in_schema=True)
 @web_router.post("/search_by_hotel_class", include_in_schema=True)
-def search_by_hotel_class(request: Request, query: int = Form(None)):
+def search_by_hotel_class(request: Request, query: int = Form(None), user=Depends(get_user_web)):
     context = {
         "request": request,
         'navbar': 'search',
+        'user': user,
         "travels": dao_travel_agency.get_travel_by_hotel_class(query),
         "title": "Search",
     }
@@ -222,5 +228,54 @@ def get_travel_by_id_web(request: Request, travel_id: int, user=Depends(get_user
         "user": user,
     }
     response = templates.TemplateResponse("details.html", context=context)
+    response_with_cookies = set_cookies_web(user, response)
+    return response_with_cookies
+
+
+@web_router.post('/add-travel-to-cart/')
+def add_travel_to_cart(request: Request, travel_id: int = Form(), user=Depends(get_user_web)):
+    travel = dao_travel_agency.get_travel_by_id(travel_id)
+    if not all([user, travel]):
+        context = {
+            'request': request,
+            'products': get_all_travel(50, 0, ''),
+            'title': 'Main page',
+        }
+        return templates.TemplateResponse('index.html', context=context)
+    order: Order = dao_travel_agency.get_or_create(Order, user_id=user.id, is_closed=False)
+    order_travel: OrderTravel = dao_travel_agency.get_or_create(OrderTravel, order_id=order.id, travel_id=travel_id)
+    order_travel.quantity += 1
+    order_travel.price = travel.price
+    session.add(order_travel)
+    session.commit()
+    session.refresh(order_travel)
+
+    redirect_url = request.url_for('search')
+    response = RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
+    response_with_cookies = set_cookies_web(user, response)
+    return response_with_cookies
+
+
+@web_router.get('/cart', include_in_schema=True)
+def cart(request: Request, user=Depends(get_user_web)):
+    if not user:
+        context = {
+            'request': request,
+            'travels': get_all_travel(50, 0),
+            'title': 'Cart',
+        }
+        return templates.TemplateResponse('index.html', context=context)
+
+    order = dao_travel_agency.get_or_create(Order, user_id=user.id, is_closed=False)
+    cart = dao_travel_agency.fetch_order_travels(order.id)
+    print(cart, 9999999)
+
+    context = {
+        'request': request,
+        'cart': cart,
+        'title': 'Cart',
+        'user': user
+    }
+    response = templates.TemplateResponse('cart.html', context=context)
     response_with_cookies = set_cookies_web(user, response)
     return response_with_cookies
