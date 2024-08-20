@@ -5,7 +5,7 @@
     <div class="row pt-2 pb-1 container">
 
   {% for travel in travels %}
-
+    {% if travel.ticket_quantity != 0 %}
 
 <div class="card border-warning mb-3" style="max-width: 630px;">
   <div class="col">
@@ -14,10 +14,13 @@
       <div class="card-body">
         <h5 class="card-title">{{travel.title}}</h5>
           <h4 class="card-title">{{travel.price}}грн</h4>
+          <h6 class="card-title">Кількість квитків: {{travel.ticket_quantity}} </h6>
           <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-  <form method="post" action="{{ url_for('add_travel_to_cart') }}">
+              <form method="post" action="{{ url_for('add_travel_to_cart') }}">
+                {% if user %}
               <input type="number" name="travel_id" value="{{travel.id}}" hidden="">
               <button type="submit" class="btn btn-success">Придбати квиток</button>
+                {% endif %}
                 <a href="{{ url_for('get_travel_by_id_web', travel_id=travel.id) }}" class="btn btn-warning">Детальніше</a>
               </form>
 </div>
@@ -26,7 +29,7 @@
   </div>
 </div>
 
-
+    {% endif %}
   {% endfor %}
 
         </div>

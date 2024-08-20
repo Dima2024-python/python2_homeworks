@@ -73,6 +73,7 @@ class Travel(Base):
     price = Column(Float, nullable=False, default=100.0)
     hotel_class = Column(Integer, nullable=False)
     image = Column(String, default="")
+    ticket_quantity = Column(Integer, nullable=False)
     date_start = Column(DateTime, nullable=False)
     date_end = Column(DateTime, nullable=False)
     created_at = Column(DateTime, default=datetime.now)

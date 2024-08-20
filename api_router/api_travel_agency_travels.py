@@ -16,6 +16,7 @@ class NewTravel(BaseModel):
     description: str = Field(max_length=100, default="", examples=["Захоплююча подорож до"])
     price: float = Field(ge=0.01, examples=[100.78])
     hotel_class: int = Field(gt=0, le=5, default=4)
+    ticket_quantity: int = Field(gt=0)
     image: HttpUrl
     date_start: datetime
     date_end: datetime

@@ -19,6 +19,77 @@ web_router = APIRouter(
 )
 
 
+@web_router.post("/quantity-travel-decrease")
+def quantity_travel_decrease(request: Request, travel_id: int = Form(), user=Depends(get_user_web)):
+    travel = dao_travel_agency.get_travel_by_id(travel_id)
+    if not all([user, travel]):
+        context = {
+            "request": request,
+            "travels": get_all_travel(50, 0),
+            'navbar': 'default',
+            "title": "Main page",
+            'user': user
+        }
+        return templates.TemplateResponse("index.html", context=context)
+    order: Order = dao_travel_agency.get_or_create(Order, user_id=user.id, is_closed=False)
+    order_travel: OrderTravel = dao_travel_agency.get_or_create(OrderTravel, order_id=order.id, travel_id=travel_id)
+    if order_travel.quantity > 0:
+        order_travel.quantity -= 1
+        session.add(order_travel)
+        session.commit()
+        session.refresh(order_travel)
+    redirect_url = request.url_for("cart")
+    response = RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
+    return response
+
+
+@web_router.post("/quantity-travel-increase")
+def quantity_travel_increase(request: Request, travel_id: int = Form(), user=Depends(get_user_web)):
+    travel = dao_travel_agency.get_travel_by_id(travel_id)
+    if not all([user, travel]):
+        context = {
+            "request": request,
+            "travels": get_all_travel(50, 0),
+            'navbar': 'default',
+            "title": "Main page",
+            'user': user
+        }
+        return templates.TemplateResponse("index.html", context=context)
+    order: Order = dao_travel_agency.get_or_create(Order, user_id=user.id, is_closed=False)
+    order_travel: OrderTravel = dao_travel_agency.get_or_create(OrderTravel, order_id=order.id, travel_id=travel_id)
+    order_travel.quantity += 1
+    session.add(order_travel)
+    session.commit()
+    session.refresh(order_travel)
+    redirect_url = request.url_for("cart")
+    response = RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
+    return response
+
+
+@web_router.post("/quantity-travel-delete")
+def quantity_travel_delete(request: Request, travel_id: int = Form(), user=Depends(get_user_web)):
+    travel = dao_travel_agency.get_travel_by_id(travel_id)
+    if not all([user, travel]):
+        context = {
+            "request": request,
+            "travels": get_all_travel(50, 0),
+            'navbar': 'default',
+            "title": "Main page",
+            'user': user
+        }
+        return templates.TemplateResponse("index.html", context=context)
+    order: Order = dao_travel_agency.get_or_create(Order, user_id=user.id, is_closed=False)
+    order_travel: OrderTravel = dao_travel_agency.get_or_create(OrderTravel, order_id=order.id, travel_id=travel_id)
+
+    order_travel.quantity = 0
+    session.add(order_travel)
+    session.commit()
+    session.refresh(order_travel)
+    redirect_url = request.url_for("cart")
+    response = RedirectResponse(redirect_url, status_code=status.HTTP_303_SEE_OTHER)
+    return response
+
+
 @web_router.get('/', include_in_schema=True)
 @web_router.post('/', include_in_schema=True)
 def index(request: Request, user=Depends(get_user_web)):
@@ -55,6 +126,7 @@ def search_by_country(request: Request, query: str = Form(None), user=Depends(ge
         'user': user,
         "travels": dao_travel_agency.get_travel_by_country(query),
         "title": "Search",
+        'country_value': query
     }
     response = templates.TemplateResponse("index_search.html", context=context)
     return response
@@ -82,6 +154,7 @@ def search_by_price(request: Request, query: float = Form(None), user=Depends(ge
         'user': user,
         "travels": dao_travel_agency.get_travel_by_price(query),
         "title": "Search",
+        'price_value': query
     }
     response = templates.TemplateResponse("index_search.html", context=context)
     return response
@@ -96,6 +169,7 @@ def search_by_hotel_class(request: Request, query: int = Form(None), user=Depend
         'user': user,
         "travels": dao_travel_agency.get_travel_by_hotel_class(query),
         "title": "Search",
+        'hotel_class_value': query
     }
     response = templates.TemplateResponse("index_search.html", context=context)
     return response
@@ -238,7 +312,8 @@ def add_travel_to_cart(request: Request, travel_id: int = Form(), user=Depends(g
     if not all([user, travel]):
         context = {
             'request': request,
-            'products': get_all_travel(50, 0, ''),
+            'navbar': 'default',
+            'travels': get_all_travel(50, 0, ''),
             'title': 'Main page',
         }
         return templates.TemplateResponse('index.html', context=context)
@@ -261,6 +336,7 @@ def cart(request: Request, user=Depends(get_user_web)):
     if not user:
         context = {
             'request': request,
+            'navbar': 'default',
             'travels': get_all_travel(50, 0),
             'title': 'Cart',
         }
