@@ -8,7 +8,7 @@ from utils.utils_hashlib import get_password_hash
 
 
 def create_travel(
-    title: str, description: str, price: float, country: str, image, hotel_class: int, date_start, date_end
+    title: str, description: str, price: float, country: str, image, hotel_class: int, ticket_quantity: int, date_start, date_end
 ) -> Travel:
     travel = Travel(
         title=title,
@@ -16,6 +16,7 @@ def create_travel(
         description=description,
         price=price,
         hotel_class=hotel_class,
+        ticket_quantity=ticket_quantity,
         image=str(image),
         date_start=date_start,
         date_end=date_end,
